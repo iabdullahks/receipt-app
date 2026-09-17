@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>Ustaad Anwar - Quotation & Invoice</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===================== LOGIN SCREEN ===================== -->
+<div id="loginScreen" class="login-wrap">
+  <div class="login-card">
+    <h1 data-i18n="appTitle">استاد انور</h1>
+    <p class="login-sub" data-i18n="loginSub">Quotation &amp; Invoice System</p>
+
+    <div class="field" style="margin-top:20px;">
+      <label data-i18n="yourNameOptional">Your Name (optional)</label>
+      <input id="loginName" type="text" placeholder="e.g. Bilal" data-i18n-placeholder="namePlaceholder" style="direction:ltr;text-align:left;">
+    </div>
+
+    <div class="login-roles">
+      <button class="role-btn owner" onclick="login('owner')">
+        <span class="role-icon">👤</span>
+        <span data-i18n="roleOwner">Owner</span>
+        <small data-i18n="ownerDesc">Full access + products + all history</small>
+      </button>
+      <button class="role-btn cashier" onclick="login('cashier')">
+        <span class="role-icon">🧾</span>
+        <span data-i18n="roleCashier">Cashier</span>
+        <small data-i18n="cashierDesc">Create bills + today's own entries</small>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MAIN APP ===================== -->
+<div id="appScreen" class="app-wrap" style="display:none;">
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <b id="shopTitleTop">استاد انور</b>
+      <span id="roleBadge" class="role-badge">Owner</span>
+    </div>
+    <div class="topbar-right">
+      <button class="lang-toggle" onclick="toggleLang()" data-i18n="langToggle">اردو / EN</button>
+      <button class="btn btn-secondary small" onclick="logout()" data-i18n="switchUser">Switch User</button>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabBar">
+    <button class="tab active" data-tab="bill" onclick="showTab('bill')" id="tabLabelBill" data-i18n="tabBill">New Bill</button>
+    <button class="tab" data-tab="history" onclick="showTab('history')" id="tabLabelHistory" data-i18n="tabHistory">History</button>
+    <button class="tab owner-only" data-tab="products" onclick="showTab('products')" id="tabLabelProducts" data-i18n="tabProducts">Products</button>
+    <button class="tab owner-only" data-tab="settings" onclick="showTab('settings')" id="tabLabelSettings" data-i18n="tabSettings">Shop Settings</button>
+  </div>
+
+  <!-- ---------- TAB: NEW BILL ---------- -->
+  <div class="tab-panel" id="tab-bill">
+    <div class="split">
+      <div class="panel">
+        <div class="doc-type-toggle">
+          <button id="btnTypeQuote" class="active" onclick="setDocType('Quotation')" data-i18n="docTypeQuote">Quotation</button>
+          <button id="btnTypeInv" onclick="setDocType('Invoice')" data-i18n="docTypeInv">Invoice</button>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label data-i18n="lblDate">Date</label>
+            <input id="docDate" type="date">
+          </div>
+          <div class="field">
+            <label data-i18n="lblDocNum">Doc #</label>
+            <input id="docInv" value="" readonly style="background:#f7f7f7;">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label data-i18n="lblTime">Time</label>
+            <input id="docTime" type="time">
+          </div>
+          <div class="field">
+            <label data-i18n="lblStaffName">Staff Name</label>
+            <input id="docUser" value="">
+          </div>
+        </div>
+
+        <div class="add-row-box">
+          <div class="field" style="margin-bottom:8px;">
+            <label style="direction:ltr;text-align:left;" data-i18n="lblProduct">Product</label>
+            <select id="prodSelect"></select>
+          </div>
+          <div class="add-row-grid">
+            <div class="field" style="margin-bottom:0;">
+              <label data-i18n="lblRate">Rate</label>
+              <input id="prodRate" type="number" step="0.01">
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label data-i18n="lblQty">Qty</label>
+              <input id="prodQty" type="number" value="1" min="1">
+            </div>
+            <button class="btn btn-primary" style="margin-top:0;" onclick="addItem()" data-i18n="btnAddItem">+ Add</button>
+          </div>
+        </div>
+
+        <div class="item-list" id="itemList"></div>
+
+        <button class="btn btn-secondary" onclick="clearAll()" data-i18n="btnClearAll">Clear all items</button>
+        <button class="btn btn-print" onclick="printBill()" data-i18n="btnPrint">🖨️ Print / Save as PDF</button>
+        <button class="btn btn-save" onclick="saveDocument()" data-i18n="btnSave">💾 Save &amp; Get Next Number</button>
+        <button class="btn btn-convert" id="convertBtn" style="display:none;" onclick="convertToInvoice()" data-i18n="btnConvert">↻ Convert this Quotation to Invoice</button>
+      </div>
+
+      <div class="receipt-wrap">
+        <div class="receipt">
+          <div class="shop-name" id="rName">استاد انور</div>
+          <div class="shop-sub" id="rAddr">فتح خان بازار بہاولپور</div>
+          <div class="shop-sub" id="rPhone" style="direction:ltr;">Ph. 0622-882554</div>
+          <div class="doc-title" id="rDocTitle">Quotation</div>
+
+          <div class="meta-line"><span id="mDate">Date: —</span><span id="mTime">Time: —</span></div>
+          <div class="meta-line"><span id="mInv">Doc#: —</span><span id="mUser">Staff: —</span></div>
+
+          <hr class="solid">
+
+          <table class="items">
+            <thead>
+              <tr>
+                <th class="c-total" data-i18n="thTotal">Total</th>
+                <th class="c-rate" data-i18n="thRate">Rate</th>
+                <th class="c-prod" data-i18n="thProduct">Product</th>
+                <th class="c-qty" data-i18n="thQty">Qty</th>
+              </tr>
+            </thead>
+            <tbody id="rBody">
+              <tr><td colspan="4" class="empty-msg" data-i18n="msgNoItems">No items added yet</td></tr>
+            </tbody>
+          </table>
+
+          <div class="totals">
+            <div class="left" id="tQty">0/0<br><span data-i18n="lblTotalItemsQty">Total Items/Quantity</span></div>
+            <div class="right">
+              <div class="lbl" data-i18n="lblGrandTotal">Total</div>
+              <div class="amt" id="tAmt">0</div>
+            </div>
+          </div>
+
+          <div class="thanks" data-i18n="msgThanks">Thank you for your business!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------- TAB: HISTORY ---------- -->
+  <div class="tab-panel" id="tab-history" style="display:none;">
+    <h2 id="historyTitle" data-i18n="historyTitle">All Saved Documents</h2>
+    <div class="history-filters" id="ownerFilters" style="display:none;">
+      <select id="filterType">
+        <option value="" data-i18n="filterAllTypes">All types</option>
+        <option value="Quotation" data-i18n="docTypeQuote">Quotation</option>
+        <option value="Invoice" data-i18n="docTypeInv">Invoice</option>
+      </select>
+      <input id="filterDate" type="date">
+      <button class="btn btn-secondary small" onclick="renderHistory()" data-i18n="btnFilter">Filter</button>
+      <button class="btn btn-secondary small" onclick="clearFilter()" data-i18n="btnClearFilter">Clear</button>
+    </div>
+    <div class="history-list-full" id="historyListFull"></div>
+  </div>
+
+  <!-- ---------- TAB: PRODUCTS (owner only) ---------- -->
+  <div class="tab-panel owner-only" id="tab-products" style="display:none;">
+    <h2 data-i18n="manageProductsTitle">Manage Products &amp; Prices</h2>
+    <div class="add-row-box" style="max-width:500px;">
+      <div class="row2">
+        <div class="field">
+          <label data-i18n="lblNewProdName">New Product Name (Urdu)</label>
+          <input id="newProdName" style="direction:rtl;text-align:right;">
+        </div>
+        <div class="field" style="max-width:120px;">
+          <label data-i18n="lblRate">Rate</label>
+          <input id="newProdRate" type="number" step="0.01">
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="addProduct()" data-i18n="btnAddProduct">+ Add Product</button>
+    </div>
+    <table class="prod-table" id="prodTable">
+      <thead>
+        <tr>
+          <th data-i18n="thProduct">Product</th>
+          <th data-i18n="thRate">Rate</th>
+          <th style="width:50px;"></th>
+        </tr>
+      </thead>
+      <tbody id="prodTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- ---------- TAB: SHOP SETTINGS (owner only) ---------- -->
+  <div class="tab-panel owner-only" id="tab-settings" style="display:none;">
+    <h2 data-i18n="shopSettingsTitle">Shop Settings</h2>
+    <div class="add-row-box" style="max-width:500px;">
+      <div class="field">
+        <label data-i18n="lblShopName">Shop Name (Urdu)</label>
+        <input id="setShopName" style="direction:rtl;text-align:right;">
+      </div>
+      <div class="field">
+        <label data-i18n="lblPhone">Phone</label>
+        <input id="setShopPhone">
+      </div>
+      <div class="field">
+        <label data-i18n="lblAddress">Address (Urdu)</label>
+        <input id="setShopAddr" style="direction:rtl;text-align:right;">
+      </div>
+      <div class="field">
+        <label data-i18n="lblOwnerPin">Owner PIN (leave blank for no password)</label>
+        <input id="setOwnerPin" type="password" placeholder="e.g. 1234">
+      </div>
+      <button class="btn btn-primary" onclick="saveSettingsForm()" data-i18n="btnSaveSettings">Save Settings</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== MODAL: OWNER PIN PROMPT ===== -->
+<div id="ownerPinModal" class="modal-overlay">
+  <div class="modal-box">
+    <h3 data-i18n="pinModalTitle">Owner Authentication</h3>
+    <p data-i18n="pinModalSub">Please enter your Owner PIN to continue:</p>
+    <input id="ownerPinInput" type="password" placeholder="Enter PIN" onkeydown="if(event.key==='Enter') submitOwnerPin()">
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="cancelOwnerPin()" data-i18n="btnCancel">Cancel</button>
+      <button class="btn btn-primary" onclick="submitOwnerPin()" data-i18n="btnLogin">Login</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: EDIT STAFF NAME ===== -->
+<div id="editStaffModal" class="modal-overlay">
+  <div class="modal-box">
+    <h3 data-i18n="editStaffTitle">Edit Staff Name</h3>
+    <p><span data-i18n="editStaffSub">Update the staff name for document: </span><b id="editStaffDocNum"></b></p>
+    <input id="editStaffInput" type="text" placeholder="Staff Name" onkeydown="if(event.key==='Enter') submitEditStaff()">
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="cancelEditStaff()" data-i18n="btnCancel">Cancel</button>
+      <button class="btn btn-primary" onclick="submitEditStaff()" data-i18n="btnSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

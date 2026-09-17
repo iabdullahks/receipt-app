@@ -1,0 +1,33 @@
+{
+  "name": "quotation-invoice-app",
+  "version": "1.0.0",
+  "description": "Ustaad Anwar - Quotation & Invoice desktop app (Owner/Cashier roles, offline, local data)",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "serve": "node serve.js",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.ustaadanwar.quotationapp",
+    "productName": "Ustaad Anwar Quotation App",
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
