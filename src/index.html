@@ -2,7 +2,8 @@
 <html lang="ur" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>Ustaad Anwar - Quotation & Invoice</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ustaad Anwar - Quotation & Invoice Management</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -10,24 +11,27 @@
 <!-- ===================== LOGIN SCREEN ===================== -->
 <div id="loginScreen" class="login-wrap">
   <div class="login-card">
-    <h1 data-i18n="appTitle">استاد انور</h1>
-    <p class="login-sub" data-i18n="loginSub">Quotation &amp; Invoice System</p>
+    <div class="login-brand">
+      <img id="loginLogo" class="login-logo" style="display:none;" alt="Shop Logo">
+      <h1 id="loginShopTitle" data-i18n="appTitle">استاد انور</h1>
+      <p id="loginShopSub" class="login-sub" data-i18n="loginSub">کوٹیشن اور انوائس مینجمنٹ سسٹم</p>
+    </div>
 
-    <div class="field" style="margin-top:20px;">
-      <label data-i18n="yourNameOptional">Your Name (optional)</label>
-      <input id="loginName" type="text" placeholder="e.g. Bilal" data-i18n-placeholder="namePlaceholder" style="direction:ltr;text-align:left;">
+    <div class="field" style="margin-top:24px;">
+      <label data-i18n="yourNameOptional">سٹاف کا نام (Staff Name - اختیاری)</label>
+      <input id="loginName" type="text" placeholder="مثلاً بلال / Bilal" data-i18n-placeholder="namePlaceholder" style="direction:ltr;text-align:left;">
     </div>
 
     <div class="login-roles">
-      <button class="role-btn owner" onclick="login('owner')">
+      <button type="button" class="role-btn owner" onclick="login('owner')">
         <span class="role-icon">👤</span>
-        <span data-i18n="roleOwner">Owner</span>
-        <small data-i18n="ownerDesc">Full access + products + all history</small>
+        <span class="role-name" data-i18n="roleOwner">Owner (مالک)</span>
+        <small data-i18n="ownerDesc">مکمل رسائی + انوینٹری + رپورٹس + سیٹنگز (4-Digit PIN)</small>
       </button>
-      <button class="role-btn cashier" onclick="login('cashier')">
+      <button type="button" class="role-btn cashier" onclick="login('cashier')">
         <span class="role-icon">🧾</span>
-        <span data-i18n="roleCashier">Cashier</span>
-        <small data-i18n="cashierDesc">Create bills + today's own entries</small>
+        <span class="role-name" data-i18n="roleCashier">Cashier (کیشیئر)</span>
+        <small data-i18n="cashierDesc">بل بنائیں + کیشیئر ہسٹری + پرنٹ انوائس</small>
       </button>
     </div>
   </div>
@@ -36,93 +40,146 @@
 <!-- ===================== MAIN APP ===================== -->
 <div id="appScreen" class="app-wrap" style="display:none;">
 
-  <div class="topbar">
+  <!-- TOP BAR -->
+  <header class="topbar">
     <div class="topbar-left">
-      <b id="shopTitleTop">استاد انور</b>
+      <img id="topbarLogo" class="topbar-logo" style="display:none;" alt="Shop Logo">
+      <div class="topbar-titles">
+        <b id="shopTitleTop">استاد انور</b>
+        <span id="shopSubTop" class="topbar-sub">سینیٹری اینڈ ہارڈ ویئر سٹور</span>
+      </div>
       <span id="roleBadge" class="role-badge">Owner</span>
+      <button id="adminSessionBtn" class="admin-session-btn owner-only" onclick="toggleAdminSessionLock()" title="PIN Protection Status">
+        <span id="adminSessionIcon">🔓</span>
+        <span id="adminSessionText" data-i18n="adminUnlocked">Admin Unlocked</span>
+      </button>
     </div>
     <div class="topbar-right">
-      <button class="lang-toggle" onclick="toggleLang()" data-i18n="langToggle">اردو / EN</button>
+      <button class="btn btn-header-action" onclick="toggleLang()" data-i18n="langToggle">اردو / EN</button>
       <button class="btn btn-secondary small" onclick="logout()" data-i18n="switchUser">Switch User</button>
     </div>
-  </div>
+  </header>
 
-  <div class="tabs" id="tabBar">
-    <button class="tab active" data-tab="bill" onclick="showTab('bill')" id="tabLabelBill" data-i18n="tabBill">New Bill</button>
-    <button class="tab" data-tab="history" onclick="showTab('history')" id="tabLabelHistory" data-i18n="tabHistory">History</button>
-    <button class="tab owner-only" data-tab="products" onclick="showTab('products')" id="tabLabelProducts" data-i18n="tabProducts">Products</button>
-    <button class="tab owner-only" data-tab="settings" onclick="showTab('settings')" id="tabLabelSettings" data-i18n="tabSettings">Shop Settings</button>
-  </div>
+  <!-- NAVIGATION TABS -->
+  <nav class="tabs" id="tabBar">
+    <button class="tab active" data-tab="bill" onclick="showTab('bill')" id="tabLabelBill" data-i18n="tabBill">📝 New Bill</button>
+    <button class="tab" data-tab="invoices" onclick="showTab('invoices')" id="tabLabelInvoices" data-i18n="tabInvoices">🧾 Invoices</button>
+    <button class="tab" data-tab="quotations" onclick="showTab('quotations')" id="tabLabelQuotations" data-i18n="tabQuotations">📋 Quotations</button>
+    <button class="tab" data-tab="cashierHistory" onclick="showTab('cashierHistory')" id="tabLabelCashierHistory" data-i18n="tabCashierHistory">👤 Cashier History</button>
+    <button class="tab owner-only" data-tab="products" onclick="showTab('products')" id="tabLabelProducts" data-i18n="tabProducts">📦 Products &amp; Stock</button>
+    <button class="tab owner-only" data-tab="settings" onclick="showTab('settings')" id="tabLabelSettings" data-i18n="tabSettings">⚙️ Shop Settings</button>
+  </nav>
 
-  <!-- ---------- TAB: NEW BILL ---------- -->
-  <div class="tab-panel" id="tab-bill">
+  <!-- ==================== TAB: NEW BILL ==================== -->
+  <main class="tab-panel" id="tab-bill">
     <div class="split">
-      <div class="panel">
+      <!-- BILL EDITOR FORM -->
+      <section class="panel bill-panel">
         <div class="doc-type-toggle">
-          <button id="btnTypeQuote" class="active" onclick="setDocType('Quotation')" data-i18n="docTypeQuote">Quotation</button>
-          <button id="btnTypeInv" onclick="setDocType('Invoice')" data-i18n="docTypeInv">Invoice</button>
+          <button id="btnTypeQuote" class="active" onclick="setDocType('Quotation')" data-i18n="docTypeQuote">📋 Quotation (کوٹیشن)</button>
+          <button id="btnTypeInv" onclick="setDocType('Invoice')" data-i18n="docTypeInv">🧾 Invoice (انوائس / فروخت)</button>
         </div>
 
         <div class="row2">
           <div class="field">
-            <label data-i18n="lblDate">Date</label>
+            <label for="docDate" data-i18n="lblDate">تاریخ (Date)</label>
             <input id="docDate" type="date">
           </div>
           <div class="field">
-            <label data-i18n="lblDocNum">Doc #</label>
-            <input id="docInv" value="" readonly style="background:#f7f7f7;">
+            <label for="docInv" data-i18n="lblDocNum">ڈاکومنٹ نمبر (Doc #)</label>
+            <input id="docInv" value="" readonly class="input-readonly">
           </div>
         </div>
+
         <div class="row2">
           <div class="field">
-            <label data-i18n="lblTime">Time</label>
+            <label for="docTime" data-i18n="lblTime">وقت (Time)</label>
             <input id="docTime" type="time">
           </div>
           <div class="field">
-            <label data-i18n="lblStaffName">Staff Name</label>
-            <input id="docUser" value="">
+            <label for="docUser" data-i18n="lblStaffName">کیشیئر / سٹاف کا نام (Staff Name)</label>
+            <input id="docUser" value="" placeholder="Cashier Name">
           </div>
         </div>
 
+        <!-- SEARCHABLE COMBOBOX PRODUCT SELECTION -->
         <div class="add-row-box">
-          <div class="field" style="margin-bottom:8px;">
-            <label style="direction:ltr;text-align:left;" data-i18n="lblProduct">Product</label>
-            <select id="prodSelect"></select>
+          <div class="field-header-row">
+            <label for="prodComboboxInput" data-i18n="lblSearchProduct">پروڈکٹ تلاش کریں (نام یا SKU)</label>
+            <button type="button" class="link-btn owner-only" onclick="openQuickAddModal()" data-i18n="btnQuickAdd">+ نئی پروڈکٹ شامل کریں</button>
           </div>
+
+          <div class="combobox-wrap" id="comboboxWrap">
+            <span class="combobox-search-icon">🔍</span>
+            <input id="prodComboboxInput" type="text" placeholder="Type Urdu name, English or SKU..." autocomplete="off">
+            <button type="button" id="comboboxClearBtn" class="combobox-icon-btn" onclick="clearCombobox(event)" title="Clear">✕</button>
+            <button type="button" id="comboboxToggleBtn" class="combobox-icon-btn" onclick="toggleCombobox(event)" title="Show all">▼</button>
+            <div id="comboboxDropdown" class="combobox-dropdown" style="display:none;"></div>
+          </div>
+
+          <!-- Selected Product Info Chip -->
+          <div id="selectedProdChip" class="selected-prod-chip" style="display:none;">
+            <div class="chip-item"><span class="chip-label">SKU:</span> <b id="chipSku">—</b></div>
+            <div class="chip-item"><span class="chip-label">Category:</span> <b id="chipCategory">—</b></div>
+            <div class="chip-item"><span class="chip-label">Stock:</span> <b id="chipStock" class="badge-stock-pill">—</b></div>
+          </div>
+
           <div class="add-row-grid">
             <div class="field" style="margin-bottom:0;">
-              <label data-i18n="lblRate">Rate</label>
-              <input id="prodRate" type="number" step="0.01">
+              <label for="prodRate" data-i18n="lblRate">قیمت / ریٹ (Rate)</label>
+              <input id="prodRate" type="number" step="0.01" placeholder="0.00">
             </div>
             <div class="field" style="margin-bottom:0;">
-              <label data-i18n="lblQty">Qty</label>
+              <label for="prodQty" data-i18n="lblQty">تعداد (Qty)</label>
               <input id="prodQty" type="number" value="1" min="1">
             </div>
-            <button class="btn btn-primary" style="margin-top:0;" onclick="addItem()" data-i18n="btnAddItem">+ Add</button>
+            <button class="btn btn-primary btn-add-item" onclick="addItem()" data-i18n="btnAddItem">+ شامل کریں (+ Add)</button>
           </div>
         </div>
 
-        <div class="item-list" id="itemList"></div>
+        <!-- ITEMS IN CURRENT BILL -->
+        <div class="item-list-wrap">
+          <div class="item-list-header">
+            <span data-i18n="itemsInBill">بل میں شامل اشیاء</span>
+            <span id="itemsCountBadge" class="badge-count">0</span>
+          </div>
+          <div class="item-list" id="itemList"></div>
+        </div>
 
-        <button class="btn btn-secondary" onclick="clearAll()" data-i18n="btnClearAll">Clear all items</button>
-        <button class="btn btn-print" onclick="printBill()" data-i18n="btnPrint">🖨️ Print / Save as PDF</button>
-        <button class="btn btn-save" onclick="saveDocument()" data-i18n="btnSave">💾 Save &amp; Get Next Number</button>
-        <button class="btn btn-convert" id="convertBtn" style="display:none;" onclick="convertToInvoice()" data-i18n="btnConvert">↻ Convert this Quotation to Invoice</button>
-      </div>
+        <div class="bill-actions">
+          <button class="btn btn-secondary" onclick="clearAll()" data-i18n="btnClearAll">تمام اشیاء صاف کریں (Clear)</button>
+          <button class="btn btn-print" onclick="printBill()" data-i18n="btnPrint">🖨️ پرنٹ / PDF محفوظ کریں (Print)</button>
+          <button class="btn btn-save" onclick="saveDocument()" data-i18n="btnSave">💾 محفوظ کریں اور اگلا نمبر لیں (Save)</button>
+          <button class="btn btn-convert" id="convertBtn" style="display:none;" onclick="convertToInvoice()" data-i18n="btnConvert">↻ اس کوٹیشن کو انوائس میں تبدیل کریں</button>
+        </div>
+      </section>
 
-      <div class="receipt-wrap">
-        <div class="receipt">
-          <div class="shop-name" id="rName">استاد انور</div>
-          <div class="shop-sub" id="rAddr">فتح خان بازار بہاولپور</div>
-          <div class="shop-sub" id="rPhone" style="direction:ltr;">Ph. 0622-882554</div>
-          <div class="doc-title" id="rDocTitle">Quotation</div>
+      <!-- RECEIPT PREVIEW (PRINTABLE THERMAL FORMAT) -->
+      <aside class="receipt-wrap">
+        <div class="receipt" id="printableReceipt">
+          <div class="receipt-header">
+            <img id="rLogo" class="r-logo" style="display:none;" alt="Logo">
+            <div class="shop-name" id="rName">استاد انور</div>
+            <div class="shop-sub" id="rSub">سینیٹری اینڈ ہارڈ ویئر سٹور</div>
+            <div class="shop-addr" id="rAddr">فتح خان بازار بہاولپور</div>
+            <div class="shop-phone" id="rPhone" style="direction:ltr;">Ph. 0622-882554</div>
+            <div class="doc-title" id="rDocTitle">Quotation</div>
+          </div>
 
-          <div class="meta-line"><span id="mDate">Date: —</span><span id="mTime">Time: —</span></div>
-          <div class="meta-line"><span id="mInv">Doc#: —</span><span id="mUser">Staff: —</span></div>
+          <div class="meta-box">
+            <div class="meta-line">
+              <span id="mDate">Date: —</span>
+              <span id="mTime">Time: —</span>
+            </div>
+            <div class="meta-line">
+              <span id="mInv">Doc#: —</span>
+              <span id="mUser">Staff: —</span>
+            </div>
+          </div>
 
-          <hr class="solid">
+          <hr class="receipt-divider">
 
-          <table class="items">
+          <table class="receipt-items">
             <thead>
               <tr>
                 <th class="c-total" data-i18n="thTotal">Total</th>
@@ -132,119 +189,412 @@
               </tr>
             </thead>
             <tbody id="rBody">
-              <tr><td colspan="4" class="empty-msg" data-i18n="msgNoItems">No items added yet</td></tr>
+              <tr><td colspan="4" class="empty-msg" data-i18n="msgNoItems">کوئی آئٹم شامل نہیں کیا گیا</td></tr>
             </tbody>
           </table>
 
-          <div class="totals">
-            <div class="left" id="tQty">0/0<br><span data-i18n="lblTotalItemsQty">Total Items/Quantity</span></div>
-            <div class="right">
-              <div class="lbl" data-i18n="lblGrandTotal">Total</div>
+          <div class="receipt-totals">
+            <div class="totals-left" id="tQty">0/0<br><span data-i18n="lblTotalItemsQty">Total Items / Qty</span></div>
+            <div class="totals-right">
+              <div class="lbl" data-i18n="lblGrandTotal">میزان / Total (Rs.)</div>
               <div class="amt" id="tAmt">0</div>
             </div>
           </div>
 
-          <div class="thanks" data-i18n="msgThanks">Thank you for your business!</div>
+          <div class="receipt-footer">
+            <p class="thanks-msg" id="rThanks" data-i18n="msgThanks">آپ کے تعاون کا بہت شکریہ!</p>
+            <p class="software-credit">Software: Ustaad Anwar Management System</p>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- ==================== TAB: INVOICES (STRICTLY SALES INVOICES) ==================== -->
+  <section class="tab-panel" id="tab-invoices" style="display:none;">
+    <div class="panel-header">
+      <div>
+        <h2 data-i18n="invoicesTitle">فروخت انوائسز ہسٹری (Sales Invoices History)</h2>
+        <p class="panel-subtitle" data-i18n="invoicesSub">تمام محفوظ شدہ سیلز انوائسز کا ریکارڈ</p>
+      </div>
+      <!-- Revenue Summary Metrics -->
+      <div class="metrics-cards">
+        <div class="metric-card">
+          <span class="metric-label" data-i18n="totalInvoicesCount">کل انوائسز</span>
+          <b class="metric-value" id="invCountMetric">0</b>
+        </div>
+        <div class="metric-card revenue-card">
+          <span class="metric-label" data-i18n="totalRevenueLabel">کل سیلز آمدنی</span>
+          <div class="revenue-val-wrap">
+            <b class="metric-value" id="invRevenueMetric">Rs. 0</b>
+            <button id="btnRevealRevenue" class="btn-reveal-lock" onclick="toggleRevenuePrivacy()" title="Unlock / Hide Revenue">🔒</button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- ---------- TAB: HISTORY ---------- -->
-  <div class="tab-panel" id="tab-history" style="display:none;">
-    <h2 id="historyTitle" data-i18n="historyTitle">All Saved Documents</h2>
-    <div class="history-filters" id="ownerFilters" style="display:none;">
-      <select id="filterType">
-        <option value="" data-i18n="filterAllTypes">All types</option>
-        <option value="Quotation" data-i18n="docTypeQuote">Quotation</option>
-        <option value="Invoice" data-i18n="docTypeInv">Invoice</option>
-      </select>
-      <input id="filterDate" type="date">
-      <button class="btn btn-secondary small" onclick="renderHistory()" data-i18n="btnFilter">Filter</button>
-      <button class="btn btn-secondary small" onclick="clearFilter()" data-i18n="btnClearFilter">Clear</button>
+    <!-- Filters Bar -->
+    <div class="history-filters-bar">
+      <div class="filter-group">
+        <span class="filter-icon">🔍</span>
+        <input id="invSearchInput" type="text" placeholder="Search by Invoice #, Cashier, Item..." oninput="renderInvoices()">
+      </div>
+      <div class="filter-group date-group">
+        <label for="invFilterDate" data-i18n="lblFilterDate">تاریخ:</label>
+        <input id="invFilterDate" type="date" onchange="renderInvoices()">
+      </div>
+      <div class="filter-pills">
+        <button class="pill-btn active" onclick="setInvoiceDatePill('all', this)" data-i18n="pillAll">تمام (All)</button>
+        <button class="pill-btn" onclick="setInvoiceDatePill('today', this)" data-i18n="pillToday">آج (Today)</button>
+        <button class="pill-btn" onclick="setInvoiceDatePill('yesterday', this)" data-i18n="pillYesterday">گزشتہ کل (Yesterday)</button>
+        <button class="pill-btn" onclick="setInvoiceDatePill('month', this)" data-i18n="pillMonth">اس ماہ (This Month)</button>
+      </div>
+      <button class="btn btn-secondary small" onclick="clearInvoiceFilters()" data-i18n="btnClearFilter">صاف کریں</button>
     </div>
-    <div class="history-list-full" id="historyListFull"></div>
-  </div>
 
-  <!-- ---------- TAB: PRODUCTS (owner only) ---------- -->
-  <div class="tab-panel owner-only" id="tab-products" style="display:none;">
-    <h2 data-i18n="manageProductsTitle">Manage Products &amp; Prices</h2>
-    <div class="add-row-box" style="max-width:500px;">
-      <div class="row2">
+    <div class="history-list-full" id="invoicesList"></div>
+  </section>
+
+  <!-- ==================== TAB: QUOTATIONS (DEDICATED SECTION) ==================== -->
+  <section class="tab-panel" id="tab-quotations" style="display:none;">
+    <div class="panel-header">
+      <div>
+        <h2 data-i18n="quotationsTitle">کوٹیشنز کا ریکارڈ (Quotations Section)</h2>
+        <p class="panel-subtitle" data-i18n="quotationsSub">تیار کردہ تخمینہ جات اور کوٹیشنز کو انوائس میں تبدیل کریں</p>
+      </div>
+      <div class="metrics-cards">
+        <div class="metric-card">
+          <span class="metric-label" data-i18n="totalQuotationsCount">کل کوٹیشنز</span>
+          <b class="metric-value" id="quoteCountMetric">0</b>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label" data-i18n="totalQuoteValue">تخمینی کل رقم</span>
+          <b class="metric-value" id="quoteValueMetric">Rs. 0</b>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters Bar -->
+    <div class="history-filters-bar">
+      <div class="filter-group">
+        <span class="filter-icon">🔍</span>
+        <input id="quoteSearchInput" type="text" placeholder="Search by Quotation #, Staff, Item..." oninput="renderQuotations()">
+      </div>
+      <div class="filter-group date-group">
+        <label for="quoteFilterDate" data-i18n="lblFilterDate">تاریخ:</label>
+        <input id="quoteFilterDate" type="date" onchange="renderQuotations()">
+      </div>
+      <div class="filter-pills">
+        <button class="pill-btn active" onclick="setQuoteDatePill('all', this)" data-i18n="pillAll">تمام (All)</button>
+        <button class="pill-btn" onclick="setQuoteDatePill('today', this)" data-i18n="pillToday">آج (Today)</button>
+        <button class="pill-btn" onclick="setQuoteDatePill('month', this)" data-i18n="pillMonth">اس ماہ (This Month)</button>
+      </div>
+      <button class="btn btn-secondary small" onclick="clearQuoteFilters()" data-i18n="btnClearFilter">صاف کریں</button>
+    </div>
+
+    <div class="history-list-full" id="quotationsList"></div>
+  </section>
+
+  <!-- ==================== TAB: CASHIER HISTORY (ACTIVITY & SALES LOGS) ==================== -->
+  <section class="tab-panel" id="tab-cashierHistory" style="display:none;">
+    <div class="panel-header">
+      <div>
+        <h2 data-i18n="cashierHistoryTitle">کیشیئر سرگرمی اور سیلز ریکارڈ (Cashier History &amp; Activity)</h2>
+        <p class="panel-subtitle" id="cashierSubLabel" data-i18n="cashierHistorySub">ہر کیشیئر کی انوائسز اور سیلز کی تفصیلات</p>
+      </div>
+      <!-- Cashier Performance Metrics -->
+      <div class="metrics-cards">
+        <div class="metric-card">
+          <span class="metric-label" data-i18n="cashierBillsCount">کل بلز تعداد</span>
+          <b class="metric-value" id="cashierBillsMetric">0</b>
+        </div>
+        <div class="metric-card revenue-card">
+          <span class="metric-label" data-i18n="cashierRevenueCount">وصول شدہ سیلز</span>
+          <b class="metric-value" id="cashierRevenueMetric">Rs. 0</b>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label" data-i18n="cashierUnitsCount">کل بیچی گئی تعداد</span>
+          <b class="metric-value" id="cashierUnitsMetric">0</b>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cashier Filters Bar -->
+    <div class="history-filters-bar">
+      <!-- Owner can filter by any cashier -->
+      <div class="filter-group owner-only" id="cashierSelectGroup">
+        <label for="cashierStaffSelect" data-i18n="lblSelectCashier">کیشیئر منتخب کریں:</label>
+        <select id="cashierStaffSelect" onchange="renderCashierHistory()">
+          <option value="" data-i18n="allCashiers">تمام کیشیئرز (All Cashiers)</option>
+        </select>
+      </div>
+
+      <div class="filter-group date-group">
+        <label for="cashierFilterDate" data-i18n="lblFilterDate">تاریخ:</label>
+        <input id="cashierFilterDate" type="date" onchange="renderCashierHistory()">
+      </div>
+
+      <div class="filter-pills">
+        <button class="pill-btn active" onclick="setCashierDatePill('all', this)" data-i18n="pillAll">تمام ریکارڈز</button>
+        <button class="pill-btn" onclick="setCashierDatePill('today', this)" data-i18n="pillToday">آج کی سرگرمی</button>
+        <button class="pill-btn" onclick="setCashierDatePill('month', this)" data-i18n="pillMonth">اس ماہ</button>
+      </div>
+      <button class="btn btn-secondary small" onclick="clearCashierFilters()" data-i18n="btnClearFilter">صاف کریں</button>
+    </div>
+
+    <!-- Cashier Performance Breakdown Summary (Owner view) -->
+    <div id="cashierSummaryCards" class="cashier-summary-grid owner-only"></div>
+
+    <!-- Cashier Transaction Log -->
+    <div class="history-list-full" id="cashierTransactionsList"></div>
+  </section>
+
+  <!-- ==================== TAB: PRODUCTS & INVENTORY (OWNER ONLY) ==================== -->
+  <section class="tab-panel owner-only" id="tab-products" style="display:none;">
+    <div class="panel-header">
+      <div>
+        <h2 data-i18n="manageProductsTitle">پروڈکٹس اور انوینٹری کا انتظام (Products &amp; Inventory)</h2>
+        <p class="panel-subtitle" data-i18n="manageProductsSub">نئے آئٹمز، قیمتیں، سٹاک، اور کیٹیگریز اپڈیٹ کریں</p>
+      </div>
+      <div class="metrics-cards">
+        <div class="metric-card">
+          <span class="metric-label" data-i18n="totalProductsCount">کل پروڈکٹس</span>
+          <b class="metric-value" id="prodTotalCount">0</b>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label" data-i18n="totalStockUnits">کل سٹاک یونٹس</span>
+          <b class="metric-value" id="prodTotalStock">0</b>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD NEW PRODUCT FORM -->
+    <div class="add-product-card">
+      <h3 data-i18n="addNewProductTitle">+ نیا آئٹم شامل کریں (Add New Product)</h3>
+      <div class="form-grid-5">
         <div class="field">
-          <label data-i18n="lblNewProdName">New Product Name (Urdu)</label>
-          <input id="newProdName" style="direction:rtl;text-align:right;">
+          <label for="newProdName" data-i18n="lblProdName">پروڈکٹ کا نام (Urdu / English) *</label>
+          <input id="newProdName" placeholder="مثلاً یونین 25 ایم ایم ترک پلاسٹک" style="direction:rtl;text-align:right;">
         </div>
-        <div class="field" style="max-width:120px;">
-          <label data-i18n="lblRate">Rate</label>
-          <input id="newProdRate" type="number" step="0.01">
+        <div class="field">
+          <label for="newProdSku" data-i18n="lblSku">SKU / کوڈ</label>
+          <input id="newProdSku" placeholder="e.g. SKU-022">
+        </div>
+        <div class="field">
+          <label for="newProdCategory" data-i18n="lblCategory">کیٹیگری (Category)</label>
+          <input id="newProdCategory" list="categoryDatalist" placeholder="e.g. Pipes & Fittings">
+          <datalist id="categoryDatalist">
+            <option value="Pipes & Fittings">
+            <option value="Motors & Pumps">
+            <option value="Hardware & Fittings">
+            <option value="Accessories">
+            <option value="Sanitary">
+            <option value="General">
+          </datalist>
+        </div>
+        <div class="field">
+          <label for="newProdRate" data-i18n="lblRate">قیمت / ریٹ (Rs.) *</label>
+          <input id="newProdRate" type="number" step="0.01" placeholder="0.00">
+        </div>
+        <div class="field">
+          <label for="newProdStock" data-i18n="lblStock">سٹاک تعداد (Stock) *</label>
+          <input id="newProdStock" type="number" value="50" min="0">
         </div>
       </div>
-      <button class="btn btn-primary" onclick="addProduct()" data-i18n="btnAddProduct">+ Add Product</button>
+      <div class="form-actions-right">
+        <button class="btn btn-primary" onclick="addProduct()" data-i18n="btnAddProduct">+ ڈیٹا بیس میں محفوظ کریں (Save Product)</button>
+      </div>
     </div>
-    <table class="prod-table" id="prodTable">
-      <thead>
-        <tr>
-          <th data-i18n="thProduct">Product</th>
-          <th data-i18n="thRate">Rate</th>
-          <th style="width:50px;"></th>
-        </tr>
-      </thead>
-      <tbody id="prodTableBody"></tbody>
-    </table>
-  </div>
 
-  <!-- ---------- TAB: SHOP SETTINGS (owner only) ---------- -->
-  <div class="tab-panel owner-only" id="tab-settings" style="display:none;">
-    <h2 data-i18n="shopSettingsTitle">Shop Settings</h2>
-    <div class="add-row-box" style="max-width:500px;">
-      <div class="field">
-        <label data-i18n="lblShopName">Shop Name (Urdu)</label>
-        <input id="setShopName" style="direction:rtl;text-align:right;">
+    <!-- INVENTORY SEARCH & TABLE -->
+    <div class="inventory-table-wrap">
+      <div class="inventory-toolbar">
+        <div class="search-box">
+          <span class="filter-icon">🔍</span>
+          <input id="prodTableSearch" type="text" placeholder="Search by name, SKU, or category..." oninput="renderProductsTable()">
+        </div>
+        <div class="category-filter-box">
+          <select id="prodCategoryFilter" onchange="renderProductsTable()">
+            <option value="">تمام کیٹیگریز (All Categories)</option>
+          </select>
+        </div>
       </div>
-      <div class="field">
-        <label data-i18n="lblPhone">Phone</label>
-        <input id="setShopPhone">
-      </div>
-      <div class="field">
-        <label data-i18n="lblAddress">Address (Urdu)</label>
-        <input id="setShopAddr" style="direction:rtl;text-align:right;">
-      </div>
-      <div class="field">
-        <label data-i18n="lblOwnerPin">Owner PIN (leave blank for no password)</label>
-        <input id="setOwnerPin" type="password" placeholder="e.g. 1234">
-      </div>
-      <button class="btn btn-primary" onclick="saveSettingsForm()" data-i18n="btnSaveSettings">Save Settings</button>
+
+      <table class="prod-table" id="prodTable">
+        <thead>
+          <tr>
+            <th style="width:110px;" data-i18n="thSku">SKU</th>
+            <th data-i18n="thProduct">پروڈکٹ کا نام</th>
+            <th style="width:140px;" data-i18n="thCategory">کیٹیگری</th>
+            <th style="width:100px;" data-i18n="thStock">سٹاک</th>
+            <th style="width:120px;" data-i18n="thRate">قیمت (Rs.)</th>
+            <th style="width:120px; text-align:center;" data-i18n="thActions">اقدامات</th>
+          </tr>
+        </thead>
+        <tbody id="prodTableBody"></tbody>
+      </table>
     </div>
-  </div>
+  </section>
+
+  <!-- ==================== TAB: SHOP SETTINGS (OWNER ONLY) ==================== -->
+  <section class="tab-panel owner-only" id="tab-settings" style="display:none;">
+    <div class="panel-header">
+      <div>
+        <h2 data-i18n="shopSettingsTitle">دکان کی معلومات اور سیٹنگز (Shop Settings)</h2>
+        <p class="panel-subtitle" data-i18n="shopSettingsSub">نام، پتہ، فون نمبر، دکان کا لوگو اور 4-Digit Owner PIN تبدیل کریں</p>
+      </div>
+    </div>
+
+    <div class="settings-grid">
+      <!-- SHOP BRANDING CARD -->
+      <div class="settings-card">
+        <h3 data-i18n="shopBrandingTitle">🏢 دکان کی معلومات اور برانڈنگ</h3>
+
+        <div class="field">
+          <label for="setShopName" data-i18n="lblShopName">دکان کا نام (Shop Name) *</label>
+          <input id="setShopName" style="direction:rtl;text-align:right;" placeholder="استاد انور">
+        </div>
+
+        <div class="field">
+          <label for="setShopSub" data-i18n="lblShopSub">ذیلی عنوان / ٹیگ لائن (Subtitle / Tagline)</label>
+          <input id="setShopSub" style="direction:rtl;text-align:right;" placeholder="سینیٹری اینڈ ہارڈ ویئر سٹور">
+        </div>
+
+        <div class="field">
+          <label for="setShopAddr" data-i18n="lblAddress">پتہ (Shop Address)</label>
+          <input id="setShopAddr" style="direction:rtl;text-align:right;" placeholder="فتح خان بازار بہاولپور">
+        </div>
+
+        <div class="field">
+          <label for="setShopPhone" data-i18n="lblPhone">رابطہ / فون نمبر (Phone Number)</label>
+          <input id="setShopPhone" placeholder="Ph. 0622-882554">
+        </div>
+
+        <!-- LOGO UPLOAD & PREVIEW -->
+        <div class="field logo-field">
+          <label data-i18n="lblShopLogo">دکان کا لوگو (Shop Logo)</label>
+          <div class="logo-preview-box">
+            <div id="logoPreviewContainer" class="logo-preview-container">
+              <span id="logoPlaceholderText" class="logo-placeholder" data-i18n="noLogoYet">لوگو موجود نہیں</span>
+              <img id="logoPreviewImg" class="logo-preview-img" style="display:none;" alt="Shop Logo Preview">
+            </div>
+            <div class="logo-actions">
+              <label for="logoFileInput" class="btn btn-secondary small logo-upload-label" data-i18n="btnUploadLogo">📁 نیا لوگو منتخب کریں</label>
+              <input type="file" id="logoFileInput" accept="image/*" style="display:none;" onchange="handleLogoUpload(event)">
+              <button type="button" id="btnRemoveLogo" class="btn btn-danger small" onclick="removeLogo()" style="display:none;" data-i18n="btnRemoveLogo">حذف لوگو</button>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="saveSettingsForm()" data-i18n="btnSaveSettings">💾 سیٹنگز محفوظ کریں (Save Settings)</button>
+      </div>
+
+      <!-- 4-DIGIT OWNER PIN SECURITY CARD -->
+      <div class="settings-card security-card">
+        <h3 data-i18n="pinSecurityTitle">🔒 4-Digit Owner PIN سیکیورٹی</h3>
+        <p class="settings-hint" data-i18n="pinSecurityHint">حساس کاموں (سیلز آمدنی، قیمتوں کی تبدیلی، سیٹنگز، اور حذف) کے لیے 4 ہندسوں کا پن کوڈ استعمال کریں۔</p>
+
+        <div class="pin-status-box">
+          <span class="pin-status-icon">🛡️</span>
+          <div>
+            <b data-i18n="pinProtectionActive">4-Digit PIN پروٹیکشن فعال ہے</b>
+            <p class="pin-status-sub" data-i18n="pinCurrentHint">ڈیفالٹ پن کوڈ 1234 ہے، نیچے سے تبدیل کریں:</p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="currentOwnerPinInput" data-i18n="lblCurrentPin">موجودہ 4-Digit PIN</label>
+          <input id="currentOwnerPinInput" type="password" maxlength="4" placeholder="••••" style="direction:ltr;text-align:center;letter-spacing:6px;font-size:18px;">
+        </div>
+
+        <div class="field">
+          <label for="newOwnerPinInput" data-i18n="lblNewPin">نیا 4-Digit PIN (صرف 4 ہندسے)</label>
+          <input id="newOwnerPinInput" type="password" maxlength="4" placeholder="••••" style="direction:ltr;text-align:center;letter-spacing:6px;font-size:18px;">
+        </div>
+
+        <div class="field">
+          <label for="confirmOwnerPinInput" data-i18n="lblConfirmPin">نئے PIN کی تصدیق کریں</label>
+          <input id="confirmOwnerPinInput" type="password" maxlength="4" placeholder="••••" style="direction:ltr;text-align:center;letter-spacing:6px;font-size:18px;">
+        </div>
+
+        <button class="btn btn-primary" onclick="changeOwnerPin()" data-i18n="btnUpdatePin">🔑 4-Digit PIN اپڈیٹ کریں (Update PIN)</button>
+      </div>
+    </div>
+  </section>
 
 </div>
 
-<!-- ===== MODAL: OWNER PIN PROMPT ===== -->
+<!-- ===================== MODAL: 4-DIGIT OWNER PIN VERIFICATION ===================== -->
 <div id="ownerPinModal" class="modal-overlay">
-  <div class="modal-box">
-    <h3 data-i18n="pinModalTitle">Owner Authentication</h3>
-    <p data-i18n="pinModalSub">Please enter your Owner PIN to continue:</p>
-    <input id="ownerPinInput" type="password" placeholder="Enter PIN" onkeydown="if(event.key==='Enter') submitOwnerPin()">
+  <div class="modal-box pin-modal-box">
+    <div class="modal-header-icon">🔒</div>
+    <h3 id="pinModalTitle" data-i18n="pinModalTitle">مالک تصدیق (4-Digit PIN)</h3>
+    <p id="pinModalSub" data-i18n="pinModalSub">حساس کارروائی جاری رکھنے کے لیے اپنا 4 ہندسوں کا پن کوڈ درج کریں:</p>
+    
+    <div class="pin-input-wrap">
+      <input id="ownerPinInput" type="password" maxlength="4" pattern="[0-9]*" inputmode="numeric" placeholder="••••" autofocus onkeydown="if(event.key==='Enter') submitOwnerPin()">
+    </div>
+    <p id="pinErrorMsg" class="pin-error-text" style="display:none;"></p>
+
     <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="cancelOwnerPin()" data-i18n="btnCancel">Cancel</button>
-      <button class="btn btn-primary" onclick="submitOwnerPin()" data-i18n="btnLogin">Login</button>
+      <button class="btn btn-secondary" onclick="cancelOwnerPin()" data-i18n="btnCancel">منسوخ (Cancel)</button>
+      <button class="btn btn-primary" onclick="submitOwnerPin()" data-i18n="btnVerifyPin">تصدیق کریں (Unlock)</button>
     </div>
   </div>
 </div>
 
-<!-- ===== MODAL: EDIT STAFF NAME ===== -->
+<!-- ===================== MODAL: QUICK ADD PRODUCT (BILLING SCREEN) ===================== -->
+<div id="quickAddProductModal" class="modal-overlay">
+  <div class="modal-box">
+    <h3 data-i18n="quickAddTitle">+ فوری نئی پروڈکٹ شامل کریں</h3>
+    <div class="field">
+      <label for="quickProdName" data-i18n="lblProdName">پروڈکٹ کا نام *</label>
+      <input id="quickProdName" placeholder="Product Name" style="direction:rtl;text-align:right;">
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label for="quickProdSku" data-i18n="lblSku">SKU</label>
+        <input id="quickProdSku" placeholder="e.g. SKU-025">
+      </div>
+      <div class="field">
+        <label for="quickProdCategory" data-i18n="lblCategory">کیٹیگری</label>
+        <input id="quickProdCategory" placeholder="e.g. Pipes & Fittings">
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label for="quickProdRate" data-i18n="lblRate">قیمت / ریٹ *</label>
+        <input id="quickProdRate" type="number" step="0.01" placeholder="0.00">
+      </div>
+      <div class="field">
+        <label for="quickProdStock" data-i18n="lblStock">سٹاک تعداد *</label>
+        <input id="quickProdStock" type="number" value="50" min="0">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeQuickAddModal()" data-i18n="btnCancel">منسوخ</button>
+      <button class="btn btn-primary" onclick="submitQuickAddProduct()" data-i18n="btnAddProduct">+ شامل کریں</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL: EDIT STAFF NAME ===================== -->
 <div id="editStaffModal" class="modal-overlay">
   <div class="modal-box">
-    <h3 data-i18n="editStaffTitle">Edit Staff Name</h3>
-    <p><span data-i18n="editStaffSub">Update the staff name for document: </span><b id="editStaffDocNum"></b></p>
-    <input id="editStaffInput" type="text" placeholder="Staff Name" onkeydown="if(event.key==='Enter') submitEditStaff()">
+    <h3 data-i18n="editStaffTitle">سٹاف کا نام تبدیل کریں</h3>
+    <p><span data-i18n="editStaffSub">ڈاکومنٹ کے لیے سٹاف کا نام اپڈیٹ کریں: </span><b id="editStaffDocNum"></b></p>
+    <div class="field">
+      <input id="editStaffInput" type="text" placeholder="Staff Name" onkeydown="if(event.key==='Enter') submitEditStaff()">
+    </div>
     <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="cancelEditStaff()" data-i18n="btnCancel">Cancel</button>
-      <button class="btn btn-primary" onclick="submitEditStaff()" data-i18n="btnSave">Save</button>
+      <button class="btn btn-secondary" onclick="cancelEditStaff()" data-i18n="btnCancel">منسوخ</button>
+      <button class="btn btn-primary" onclick="submitEditStaff()" data-i18n="btnSave">محفوظ کریں</button>
     </div>
   </div>
 </div>
+
+<!-- ===================== TOAST NOTIFICATION CONTAINER ===================== -->
+<div id="toastContainer" class="toast-container"></div>
 
 <script src="app.js"></script>
 </body>
