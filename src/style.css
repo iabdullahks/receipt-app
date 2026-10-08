@@ -1588,31 +1588,69 @@ table.receipt-items td {
 
 /* ==================== PRINT MEDIA STYLES ==================== */
 @media print {
+  @page {
+    size: 80mm auto; /* 80mm thermal paper width, auto height */
+    margin: 2mm 2mm 4mm 2mm; /* top right bottom left */
+  }
+
+  html, body {
+    width: 80mm;
+    margin: 0;
+    padding: 0;
+  }
+
   body * {
     visibility: hidden;
   }
+
   #printableReceipt, #printableReceipt * {
     visibility: visible;
   }
+
   #printableReceipt {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    max-width: 80mm; /* Standard thermal receipt paper size */
-    margin: 0 auto;
+    width: 76mm; /* 80mm minus 2mm margins on each side */
+    max-width: 76mm;
+    margin: 0;
     padding: 0;
     box-shadow: none;
     border: none;
-    background: transparent;
+    background: white;
+    font-size: 11px;
   }
+
   .receipt-wrap {
     box-shadow: none;
     border: none;
   }
-  @page {
-    margin: 4mm;
-    size: auto;
+
+  /* Ensure receipt elements are compact for thermal paper */
+  .receipt {
+    padding: 2mm !important;
+  }
+
+  .shop-name {
+    font-size: 13px !important;
+  }
+
+  .shop-sub, .shop-addr, .shop-phone {
+    font-size: 10px !important;
+  }
+
+  .receipt-items th,
+  .receipt-items td {
+    font-size: 10px !important;
+    padding: 2px 3px !important;
+  }
+
+  .doc-title {
+    font-size: 11px !important;
+  }
+
+  .thanks-msg, .software-credit {
+    font-size: 9px !important;
   }
 }
 

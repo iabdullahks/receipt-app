@@ -728,6 +728,9 @@ async function completeLogin(role, staffName) {
   currentRole = role;
   currentStaffName = staffName;
 
+  // Persist staff name across app restarts
+  try { localStorage.setItem('quotation_last_staff_name', staffName); } catch(e) {}
+
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appScreen').style.display = 'block';
 
@@ -757,7 +760,14 @@ function logout() {
   revenuePrivacyUnlocked = false;
   items = [];
 
-  document.getElementById('loginName').value = '';
+  // Restore last staff name so user doesn't have to retype it
+  try {
+    const savedName = localStorage.getItem('quotation_last_staff_name') || '';
+    document.getElementById('loginName').value = savedName;
+  } catch(e) {
+    document.getElementById('loginName').value = '';
+  }
+
   document.getElementById('docInv').value = '';
   document.getElementById('appScreen').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
@@ -1878,4 +1888,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadProducts();
   resetDateTime();
   applyLabels();
+
+  // Pre-fill login name from last session
+  try {
+    const savedName = localStorage.getItem('quotation_last_staff_name') || '';
+    if (savedName) {
+      const loginNameEl = document.getElementById('loginName');
+      if (loginNameEl) loginNameEl.value = savedName;
+    }
+  } catch(e) {}
 });
